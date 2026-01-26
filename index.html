@@ -33,6 +33,9 @@ hr{border-top:1px dashed #aaa}
   .box{padding:8px}
 }
 </style>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+
 </head>
 <body>
 
@@ -61,6 +64,7 @@ hr{border-top:1px dashed #aaa}
 <div class="total">Tổng tuần: <span id="weekTotal">0</span></div>
 <button class="btn-blue" onclick="exportTxt()">📄 Xuất báo cáo TXT</button>
 <button class="btn-blue" onclick="exportExcel()">📊 Xuất Excel (CSV)</button>
+<button class="btn-blue" onclick="exportPDF()">📑 Xuất PDF</button>
 <button class="btn-add" onclick="reloadPage()">🔄 Load lại trang</button>
 </div>
 
@@ -165,20 +169,17 @@ function exportTxt(){
     txt+=d+"\n";
     reports.filter(r=>r.d===d).forEach(r=>{
       let line = 
-        String(r.q).padEnd(maxQty+2) + 
-        r.n.padEnd(maxName+4) + 
-        ": " + 
+        String(r.q).padEnd(maxQty) + "\t" +
+        r.n.padEnd(maxName) + "\t: " +
         String(r.t).padStart(maxPrice);
       txt+=line+"\n";
     });
     txt+="\n";
   });
 
-  // căn lề dòng tổng tiền
   let totalLine = 
-    "".padEnd(maxQty+2) + 
-    "Tổng tiền".padEnd(maxName+4) + 
-    ": " + 
+    "".padEnd(maxQty) + "\t" +
+    "Tổng tiền".padEnd(maxName) + "\t: " +
     String(weekTotal.innerText).padStart(maxPrice);
   txt+=totalLine;
 
@@ -206,6 +207,30 @@ function exportExcel(){
   a.href=URL.createObjectURL(blob);
   a.download="GiayTinhTien.csv";
   a.click();
+}
+
+function exportPDF(){
+  const { jsPDF } = window.jspdf;
+  const doc = new jsPDF();
+
+  let y = 20; // vị trí dòng đầu tiên
+  doc.setFont("courier","normal"); // dùng font monospace để căn lề đẹp
+  doc.setFontSize(12);
+
+  [...new Set(reports.map(r=>r.d))].forEach(d=>{
+    doc.text(d, 10, y);
+    y += 8;
+    reports.filter(r=>r.d===d).forEach(r=>{
+      let line = `${String(r.q).padEnd(5)} ${r.n.padEnd(15)} : ${String(r.t)}`;
+      doc.text(line, 10, y);
+      y += 8;
+    });
+    y += 4;
+  });
+
+  doc.text(`Tổng tiền : ${weekTotal.innerText}`, 10, y+10);
+
+  doc.save("GiayTinhTien.pdf");
 }
 
 function reloadPage(){
