@@ -2,7 +2,7 @@
 <html lang="vi">
 <head>
 <meta charset="UTF-8">
-<title>Sổ bán bánh (cải tiến mobile + Excel)</title>
+<title>Phần mềm quản lý bán hàng</title>
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <style>
 body{font-family:Arial;background:#f4f6f8;margin:0;padding:10px}
@@ -61,6 +61,7 @@ hr{border-top:1px dashed #aaa}
 <div class="total">Tổng tuần: <span id="weekTotal">0</span> đ</div>
 <button class="btn-blue" onclick="exportTxt()">📄 Xuất báo cáo TXT</button>
 <button class="btn-blue" onclick="exportExcel()">📊 Xuất Excel (CSV)</button>
+<button class="btn-add" onclick="reloadPage()">🔄 Load lại trang</button>
 </div>
 
 <div class="box" id="reportView"></div>
@@ -195,6 +196,13 @@ function exportExcel(){
   a.href=URL.createObjectURL(blob);
   a.download="bao_cao.csv";
   a.click();
+}
+
+function reloadPage(){
+  if(confirm("Bạn có chắc chắn muốn load lại trang và xóa toàn bộ dữ liệu?")){
+    localStorage.clear();
+    location.reload();
+  }
 }
 
 renderItems();renderSelect();renderReport();
