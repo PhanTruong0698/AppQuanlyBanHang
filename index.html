@@ -2,208 +2,148 @@
 <html lang="vi">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Sổ bán bánh</title>
-
+<meta name="viewport" content="width=device-width, initial-scale=1">
 <style>
-body {
-  font-family: Arial, sans-serif;
-  background: #f6f6f6;
-  margin: 0;
-  padding: 12px;
-}
-h2 { margin-top: 0; }
-
-.card {
-  background: #fff;
-  padding: 12px;
-  border-radius: 8px;
-  margin-bottom: 12px;
-}
-
-input, select, button {
-  padding: 8px;
-  margin: 4px 0;
-  width: 100%;
-  box-sizing: border-box;
-}
-
-button {
-  background: #007bff;
-  color: #fff;
-  border: none;
-  border-radius: 6px;
-}
-
-button.danger {
-  background: #dc3545;
-}
-
-table {
-  width: 100%;
-  border-collapse: collapse;
-  margin-top: 8px;
-}
-
-th, td {
-  border-bottom: 1px solid #ddd;
-  padding: 6px;
-  text-align: center;
-  font-size: 14px;
-}
-
-.action-btn {
-  padding: 4px 6px;
-  font-size: 12px;
-  margin: 2px;
-}
-
-.total {
-  font-weight: bold;
-  text-align: right;
-  margin-top: 8px;
-}
-
-a {
-  color: blue;
-  font-weight: bold;
-}
+body{font-family:Arial;background:#f4f6f8;padding:10px}
+.box{background:#fff;padding:12px;border-radius:10px;margin-bottom:15px}
+input,select,button{width:100%;padding:8px;margin:4px 0}
+button{border:none;border-radius:8px}
+.add{background:#4CAF50;color:#fff}
+.del{background:#e74c3c;color:#fff}
+.blue{border:2px solid #007bff;background:#fff;color:#007bff}
+.line{display:flex;gap:6px;align-items:center}
+.line span{flex:1}
+.small{width:60px}
+hr{border-top:1px dashed #aaa}
 </style>
 </head>
-
 <body>
 
-<h2>📒 Sổ bán bánh</h2>
-
-<div class="card">
-  <label>Mặt hàng</label>
-  <input id="itemName" placeholder="VD: Cù mì">
-
-  <label>Số lượng</label>
-  <input id="quantity" type="number">
-
-  <label>Thành tiền</label>
-  <input id="price" type="number">
-
-  <button onclick="addItem()">➕ Thêm mặt hàng</button>
+<h3>📦 Quản lý mặt hàng</h3>
+<div class="box">
+<input id="itemName" placeholder="Tên mặt hàng">
+<input id="itemPrice" type="number" placeholder="Đơn giá">
+<button class="add" onclick="saveItem()">➕ Thêm / Cập nhật</button>
+<div id="itemList"></div>
 </div>
 
-<div class="card">
-  <h3>Danh sách mặt hàng</h3>
-  <table>
-    <thead>
-      <tr>
-        <th>Tên</th>
-        <th>SL</th>
-        <th>Tiền</th>
-        <th>Thao tác</th>
-      </tr>
-    </thead>
-    <tbody id="itemTable"></tbody>
-  </table>
+<h3>🧾 Nhập báo cáo</h3>
+<div class="box">
+<select id="day" onchange="renderItemSelect()">
+<option>Thứ 2</option><option>Thứ 3</option><option>Thứ 4</option>
+<option>Thứ 5</option><option>Thứ 6</option><option>Thứ 7</option><option>Chủ nhật</option>
+</select>
 
-  <div class="total" id="totalMoney">Tổng: 0 đ</div>
-
-  <button class="danger" onclick="clearAll()">🗑 Xoá tất cả</button>
+<select id="itemSelect"></select>
+<input id="qty" type="number" placeholder="Số lượng">
+<button class="add" onclick="addReport()">➕ Thêm</button>
+<button class="del" onclick="clearReports()">🗑 Xoá toàn bộ báo cáo</button>
 </div>
 
-<div class="card">
-  <a href="#" onclick="exportReport()">📄 Xem báo cáo</a>
+<div class="box">
+<button class="blue" onclick="viewReport()">📄 Xem báo cáo</button>
+<button onclick="exportTxt()">⬇ Xuất file text</button>
+<div id="reportView" style="margin-top:10px"></div>
 </div>
 
 <script>
-let items = JSON.parse(localStorage.getItem("items") || "[]");
-let editIndex = -1;
+let items=JSON.parse(localStorage.getItem("items")||"[]");
+let reports=JSON.parse(localStorage.getItem("reports")||"[]");
 
-function save() {
-  localStorage.setItem("items", JSON.stringify(items));
+function save(){
+localStorage.setItem("items",JSON.stringify(items));
+localStorage.setItem("reports",JSON.stringify(reports));
 }
 
-function render() {
-  const tbody = document.getElementById("itemTable");
-  tbody.innerHTML = "";
-  let total = 0;
-
-  items.forEach((it, i) => {
-    total += it.price;
-    tbody.innerHTML += `
-      <tr>
-        <td>${it.name}</td>
-        <td>${it.qty}</td>
-        <td>${it.price}</td>
-        <td>
-          <button class="action-btn" onclick="editItem(${i})">✏️</button>
-          <button class="action-btn danger" onclick="deleteItem(${i})">❌</button>
-        </td>
-      </tr>
-    `;
-  });
-
-  document.getElementById("totalMoney").innerText = "Tổng: " + total + " đ";
+// ===== QUẢN LÝ MẶT HÀNG =====
+function saveItem(){
+let n=itemName.value.trim(),p=+itemPrice.value;
+if(!n||!p)return;
+let i=items.find(x=>x.name===n);
+if(i)i.price=p;
+else items.push({name:n,price:p});
+itemName.value=itemPrice.value="";
+save();renderItems();renderItemSelect();
 }
 
-function addItem() {
-  const name = itemName.value.trim();
-  const qty = Number(quantity.value);
-  const price = Number(price.value);
-
-  if (!name || !qty || !price) {
-    alert("Nhập đầy đủ thông tin");
-    return;
-  }
-
-  if (editIndex >= 0) {
-    items[editIndex] = { name, qty, price };
-    editIndex = -1;
-  } else {
-    items.push({ name, qty, price });
-  }
-
-  itemName.value = "";
-  quantity.value = "";
-  price.value = "";
-
-  save();
-  render();
+function deleteItem(n){
+items=items.filter(i=>i.name!==n);
+reports=reports.filter(r=>r.name!==n); // ⭐ xoá báo cáo liên quan
+save();renderItems();renderItemSelect();
 }
 
-function deleteItem(i) {
-  if (confirm("Xoá mặt hàng này?")) {
-    items.splice(i, 1);
-    save();
-    render();
-  }
+function renderItems(){
+itemList.innerHTML=items.map(i=>`
+<div class="line">
+<span>${i.name}</span>
+<span>${i.price}</span>
+<button onclick="deleteItem('${i.name}')">❌</button>
+</div>`).join("");
 }
 
-function editItem(i) {
-  const it = items[i];
-  itemName.value = it.name;
-  quantity.value = it.qty;
-  price.value = it.price;
-  editIndex = i;
+// ===== DROPDOWN (FIX LỖI) =====
+function renderItemSelect(){
+let d=day.value;
+let used=reports.filter(r=>r.day===d).map(r=>r.name);
+let list=items.filter(i=>!used.includes(i.name));
+itemSelect.innerHTML=list.length
+? list.map(i=>`<option>${i.name}</option>`).join("")
+: `<option disabled>-- Hết mặt hàng --</option>`;
 }
 
-function clearAll() {
-  if (confirm("Xoá toàn bộ dữ liệu?")) {
-    items = [];
-    save();
-    render();
-  }
+// ===== BÁO CÁO =====
+function addReport(){
+let d=day.value,n=itemSelect.value,q=+qty.value;
+if(!n||!q)return;
+let price=items.find(i=>i.name===n).price;
+reports.push({day:d,name:n,qty:q,total:q*price});
+qty.value="";
+save();renderItemSelect();
 }
 
-function exportReport() {
-  let text = "BÁO CÁO BÁN HÀNG\n\n";
-  let total = 0;
-  items.forEach(it => {
-    text += `${it.qty} ${it.name} : ${it.price} đ\n`;
-    total += it.price;
-  });
-  text += "\n-----------------\nTổng tiền: " + total + " đ";
-  alert(text);
+function deleteReport(i){
+reports.splice(i,1);
+save();viewReport();renderItemSelect();
 }
 
-render();
+function viewReport(){
+let html="",sum=0;
+reports.forEach((r,i)=>{
+sum+=r.total;
+html+=`
+<div class="line">
+<span>${r.qty}</span>
+<span>${r.name}:</span>
+<span class="small">${r.total}</span>
+<button onclick="deleteReport(${i})">❌</button>
+</div>`;
+});
+html+=`<hr><b>Tổng tiền: ${sum} đ</b>`;
+reportView.innerHTML=html;
+}
+
+function clearReports(){
+if(confirm("Xoá toàn bộ báo cáo?")){
+reports=[];save();reportView.innerHTML="";
+renderItemSelect();
+}
+}
+
+function exportTxt(){
+let t="",sum=0;
+reports.forEach(r=>{
+t+=`${r.day}\n${r.qty} ${r.name}: ${r.total}\n\n`;
+sum+=r.total;
+});
+t+=`Tổng tiền: ${sum} đ`;
+let a=document.createElement("a");
+a.href=URL.createObjectURL(new Blob([t],{type:"text/plain"}));
+a.download="bao_cao.txt";a.click();
+}
+
+renderItems();
+renderItemSelect();
 </script>
-
 </body>
 </html>
