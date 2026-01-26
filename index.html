@@ -6,6 +6,9 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <style>
 body{font-family:Arial;background:#f4f6f8;margin:0;padding:10px}
+
+#reportView { font-family: Arial, sans-serif; color: #000; background: #fff; }
+
 h2{margin-top:20px}
 .box{background:#fff;padding:12px;border-radius:10px;margin-bottom:15px}
 input,select,button{width:100%;padding:10px;margin:5px 0;font-size:16px}
@@ -33,9 +36,9 @@ hr{border-top:1px dashed #aaa}
   .box{padding:8px}
 }
 </style>
-
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
-
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.25/jspdf.plugin.autotable.min.js"></script>
 </head>
 <body>
 
@@ -210,25 +213,23 @@ function exportExcel(){
 }
 
 function exportPDF(){
+  renderReport();
   const { jsPDF } = window.jspdf;
-  const doc = new jsPDF();
+  let doc = new jsPDF();
 
-  let y = 20; // vị trí dòng đầu tiên
-  doc.setFont("courier","normal"); // dùng font monospace để căn lề đẹp
-  doc.setFontSize(12);
-
+  let rows = [];
   [...new Set(reports.map(r=>r.d))].forEach(d=>{
-    doc.text(d, 10, y);
-    y += 8;
+    rows.push([d,"","",""]);
     reports.filter(r=>r.d===d).forEach(r=>{
-      let line = `${String(r.q).padEnd(5)} ${r.n.padEnd(15)} : ${String(r.t)}`;
-      doc.text(line, 10, y);
-      y += 8;
+      rows.push(["", r.q, r.n, r.t]);
     });
-    y += 4;
   });
+  rows.push(["","Tổng tiền","",weekTotal.innerText]);
 
-  doc.text(`Tổng tiền : ${weekTotal.innerText}`, 10, y+10);
+  doc.autoTable({
+    head: [["Ngày","Số lượng","Mặt hàng","Thành tiền"]],
+    body: rows
+  });
 
   doc.save("GiayTinhTien.pdf");
 }
