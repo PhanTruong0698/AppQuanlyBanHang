@@ -164,39 +164,38 @@ function editReport(index){
 function exportTxt(){
   let txt = "";
 
-  // Tính độ rộng tối đa cho từng cột
-  const maxQty   = Math.max(...reports.map(r => String(r.q).length), 5);
-  const maxName  = Math.max(...reports.map(r => r.n.length), 10);
-  const maxPrice = Math.max(...reports.map(r => String(r.t).length), 8);
-
-  // Duyệt theo từng ngày
+  // duyệt theo từng ngày
   [...new Set(reports.map(r => r.d))].forEach(d => {
     txt += d + "\n";
     reports.filter(r => r.d === d).forEach(r => {
-      let line =
-        String(r.q).padEnd(maxQty) + " " +         // số lượng căn trái
-        r.n.padEnd(maxName) + " : " +              // tên mặt hàng căn trái
-        String(r.t).padStart(maxPrice);            // thành tiền căn phải
+      // số lượng luôn length = 3
+      let qty = String(r.q).padEnd(3);
+
+      // ghép số lượng + tên mặt hàng
+      let leftPart = (qty + " " + r.n);
+
+      // căn cho đủ 50 ký tự
+      leftPart = leftPart.padEnd(50);
+
+      // thành tiền
+      let line = leftPart + ": " + r.t;
       txt += line + "\n";
     });
     txt += "\n";
   });
 
-  // Dòng tổng tiền
-  let totalLine =
-    "".padEnd(maxQty) + " " +
-    "Tổng tiền".padEnd(maxName) + " : " +
-    String(weekTotal.innerText).padStart(maxPrice);
-  txt += totalLine;
+  // dòng tổng tiền
+  let totalLeft = "Tổng tiền".padEnd(50);
+  txt += totalLeft + ": " + weekTotal.innerText;
 
-  // Xuất file TXT
+  // tạo file TXT
   let blob = new Blob([txt], { type: "text/plain" });
   let a = document.createElement("a");
   a.href = URL.createObjectURL(blob);
   a.download = "GiayTinhTien.txt";
   a.click();
 }
-  
+
 function exportExcel(){
   let rows = [];
   [...new Set(reports.map(r=>r.d))].forEach(d=>{
