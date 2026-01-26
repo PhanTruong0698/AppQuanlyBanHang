@@ -64,10 +64,9 @@ hr{border-top:1px dashed #aaa}
 </div>
 
 <div class="box">
-<div class="total">Tổng tuần: <span id="weekTotal">0</span></div>
+<div class="total">Tổng tiền: <span id="weekTotal">0</span></div>
 <button class="btn-blue" onclick="exportTxt()">📄 Xuất báo cáo TXT</button>
 <button class="btn-blue" onclick="exportExcel()">📊 Xuất Excel (CSV)</button>
-<button class="btn-blue" onclick="exportPDF()">📑 Xuất PDF</button>
 <button class="btn-add" onclick="reloadPage()">🔄 Load lại trang</button>
 </div>
 
@@ -210,28 +209,6 @@ function exportExcel(){
   a.href=URL.createObjectURL(blob);
   a.download="GiayTinhTien.csv";
   a.click();
-}
-
-function exportPDF(){
-  renderReport();
-  const { jsPDF } = window.jspdf;
-  let doc = new jsPDF();
-
-  let rows = [];
-  [...new Set(reports.map(r=>r.d))].forEach(d=>{
-    rows.push([d,"","",""]);
-    reports.filter(r=>r.d===d).forEach(r=>{
-      rows.push(["", r.q, r.n, r.t]);
-    });
-  });
-  rows.push(["","Tổng tiền","",weekTotal.innerText]);
-
-  doc.autoTable({
-    head: [["Ngày","Số lượng","Mặt hàng","Thành tiền"]],
-    body: rows
-  });
-
-  doc.save("GiayTinhTien.pdf");
 }
 
 function reloadPage(){
