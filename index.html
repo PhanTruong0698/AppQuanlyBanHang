@@ -162,36 +162,41 @@ function editReport(index){
 }
 
 function exportTxt(){
-  let txt="";
-  const maxQty = Math.max(...reports.map(r=>String(r.q).length),3);
-  const maxName = Math.max(...reports.map(r=>r.n.length),0);
-  const maxPrice = Math.max(...reports.map(r=>String(r.t).length),5);
+  let txt = "";
 
-  [...new Set(reports.map(r=>r.d))].forEach(d=>{
-    txt+=d+"\n";
-    reports.filter(r=>r.d===d).forEach(r=>{
-      let line = 
-        String(r.q).padEnd(maxQty) + "\t" +
-        r.n.padEnd(maxName) + "\t: " +
-        String(r.t).padStart(maxPrice);
-      txt+=line+"\n";
+  // Tính độ rộng tối đa cho từng cột
+  const maxQty   = Math.max(...reports.map(r => String(r.q).length), 5);
+  const maxName  = Math.max(...reports.map(r => r.n.length), 10);
+  const maxPrice = Math.max(...reports.map(r => String(r.t).length), 8);
+
+  // Duyệt theo từng ngày
+  [...new Set(reports.map(r => r.d))].forEach(d => {
+    txt += d + "\n";
+    reports.filter(r => r.d === d).forEach(r => {
+      let line =
+        String(r.q).padEnd(maxQty) + " " +         // số lượng căn trái
+        r.n.padEnd(maxName) + " : " +              // tên mặt hàng căn trái
+        String(r.t).padStart(maxPrice);            // thành tiền căn phải
+      txt += line + "\n";
     });
-    txt+="\n";
+    txt += "\n";
   });
 
-  let totalLine = 
-    "".padEnd(maxQty) + "\t" +
-    "Tổng tiền".padEnd(maxName) + "\t: " +
+  // Dòng tổng tiền
+  let totalLine =
+    "".padEnd(maxQty) + " " +
+    "Tổng tiền".padEnd(maxName) + " : " +
     String(weekTotal.innerText).padStart(maxPrice);
-  txt+=totalLine;
+  txt += totalLine;
 
-  let blob=new Blob([txt],{type:"text/plain"});
-  let a=document.createElement("a");
-  a.href=URL.createObjectURL(blob);
-  a.download="GiayTinhTien.txt";
+  // Xuất file TXT
+  let blob = new Blob([txt], { type: "text/plain" });
+  let a = document.createElement("a");
+  a.href = URL.createObjectURL(blob);
+  a.download = "GiayTinhTien.txt";
   a.click();
 }
-
+  
 function exportExcel(){
   let rows = [];
   [...new Set(reports.map(r=>r.d))].forEach(d=>{
