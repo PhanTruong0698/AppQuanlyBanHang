@@ -2,7 +2,7 @@
 <html lang="vi">
 <head>
 <meta charset="UTF-8">
-<title>Sổ bán bánh</title>
+<title>Sổ bán bánh (cải tiến mobile + Excel)</title>
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <style>
 body{font-family:Arial;background:#f4f6f8;margin:0;padding:10px}
@@ -17,11 +17,21 @@ button{border:none;border-radius:8px}
 .row button{flex:1}
 .report-day{margin-top:10px}
 .line{display:flex;justify-content:space-between;border-bottom:1px solid #ddd;padding:4px 0}
-.line span{width:33%;text-align:left}
+.line span{width:25%;text-align:left}
 .line span:last-child{text-align:right}
 .total{font-weight:bold;font-size:18px}
-.edit{color:#007bff;font-size:14px}
+.edit{color:#007bff;font-size:14px;cursor:pointer}
 hr{border-top:1px dashed #aaa}
+
+/* Mobile-friendly */
+@media (max-width:600px){
+  body{padding:5px;font-size:14px}
+  input,select,button{font-size:14px;padding:8px}
+  h2{font-size:18px}
+  .line span{width:25%;font-size:13px}
+  .total{font-size:16px}
+  .box{padding:8px}
+}
 </style>
 </head>
 <body>
@@ -37,7 +47,7 @@ hr{border-top:1px dashed #aaa}
 
 <h2>🧾 Nhập báo cáo</h2>
 <div class="box">
-<select id="day">
+<select id="day" onchange="renderSelect()">
 <option>Thứ 2</option><option>Thứ 3</option><option>Thứ 4</option>
 <option>Thứ 5</option><option>Thứ 6</option><option>Thứ 7</option><option>Chủ nhật</option>
 </select>
@@ -49,7 +59,8 @@ hr{border-top:1px dashed #aaa}
 
 <div class="box">
 <div class="total">Tổng tuần: <span id="weekTotal">0</span> đ</div>
-<button class="btn-blue" onclick="exportTxt()">📄 Xem / Xuất báo cáo</button>
+<button class="btn-blue" onclick="exportTxt()">📄 Xuất báo cáo TXT</button>
+<button class="btn-blue" onclick="exportExcel()">📊 Xuất Excel (CSV)</button>
 </div>
 
 <div class="box" id="reportView"></div>
@@ -58,79 +69,132 @@ hr{border-top:1px dashed #aaa}
 let items=JSON.parse(localStorage.getItem("items")||"[]");
 let reports=JSON.parse(localStorage.getItem("reports")||"[]");
 
-function save(){localStorage.setItem("items",JSON.stringify(items));localStorage.setItem("reports",JSON.stringify(reports));}
-
-function addItem(){
-let n=itemName.value.trim(),p=+itemPrice.value;
-if(!n||!p)return;
-let i=items.find(x=>x.name===n);
-if(i)i.price=p; else items.push({name:n,price:p});
-save();renderItems();renderSelect();
-itemName.value=itemPrice.value="";
+function save(){
+  localStorage.setItem("items",JSON.stringify(items));
+  localStorage.setItem("reports",JSON.stringify(reports));
 }
 
-function clearItems(){if(confirm("Xoá tất cả mặt hàng?")){items=[];save();renderItems();renderSelect();}}
+function addItem(){
+  let n=itemName.value.trim(),p=+itemPrice.value;
+  if(!n||!p)return;
+  let i=items.find(x=>x.name===n);
+  if(i)i.price=p; else items.push({name:n,price:p});
+  save();renderItems();renderSelect();
+  itemName.value=itemPrice.value="";
+}
+
+function clearItems(){
+  if(confirm("Xoá tất cả mặt hàng?")){
+    items=[];save();renderItems();renderSelect();
+  }
+}
 
 function renderItems(){
-itemList.innerHTML=items.map(i=>`
-<div class="line">
-<span>${i.name}</span><span>${i.price}</span>
-<span class="edit" onclick="editItem('${i.name}')">Sửa</span>
-</div>`).join("");
+  itemList.innerHTML=items.map(i=>`
+    <div class="line">
+      <span>${i.name}</span><span>${i.price}</span>
+      <span class="edit" onclick="editItem('${i.name}')">Sửa</span>
+    </div>`).join("");
 }
 
 function editItem(n){
-let i=items.find(x=>x.name===n);
-itemName.value=i.name;itemPrice.value=i.price;
+  let i=items.find(x=>x.name===n);
+  itemName.value=i.name;itemPrice.value=i.price;
 }
 
 function renderSelect(){
-itemSelect.innerHTML=items.map(i=>`<option>${i.name}</option>`).join("");
+  let d = day.value;
+  let used = reports.filter(r=>r.d===d).map(r=>r.n);
+  itemSelect.innerHTML = items
+    .filter(i => !used.includes(i.name))
+    .map(i => `<option>${i.name}</option>`)
+    .join("");
 }
 
 function addReport(){
-let d=day.value,n=itemSelect.value,q=+qty.value;
-if(!n||!q)return;
-let price=items.find(i=>i.name===n).price;
-reports.push({d,n,q,t:q*price});
-save();qty.value="";renderReport();
+  let d=day.value,n=itemSelect.value,q=+qty.value;
+  if(!n||!q)return;
+  let price=items.find(i=>i.name===n).price;
+  reports.push({d,n,q,t:q*price});
+  save();qty.value="";renderReport();renderSelect();
 }
 
-function clearReports(){if(confirm("Xoá toàn bộ báo cáo?")){reports=[];save();renderReport();}}
+function clearReports(){
+  if(confirm("Xoá toàn bộ báo cáo?")){
+    reports=[];save();renderReport();renderSelect();
+  }
+}
 
 function renderReport(){
-let total=0,html="";
-[...new Set(reports.map(r=>r.d))].forEach(d=>{
-html+=`<div class="report-day"><b>${d}</b>`;
-reports.filter(r=>r.d===d).forEach(r=>{
-total+=r.t;
-html+=`
-<div class="line">
-<span>${r.q}</span><span>${r.n}</span><span>${r.t}</span>
-</div>`;
-});
-html+="<hr></div>";
-});
-weekTotal.innerText=total;
-html+=`<div class="total">Tổng tiền: ${total} đ</div>`;
-reportView.innerHTML=html;
+  let total=0,html="";
+  [...new Set(reports.map(r=>r.d))].forEach(d=>{
+    html+=`<div class="report-day"><b>${d}</b>`;
+    reports.filter(r=>r.d===d).forEach((r,idx)=>{
+      total+=r.t;
+      html+=`
+      <div class="line">
+        <span>${r.q}</span><span>${r.n}</span><span>${r.t}</span>
+        <span class="edit" onclick="editReport(${idx})">Sửa</span>
+      </div>`;
+    });
+    html+="<hr></div>";
+  });
+  weekTotal.innerText=total;
+  html+=`<div class="total">Tổng tiền: ${total} đ</div>`;
+  reportView.innerHTML=html;
+}
+
+function editReport(index){
+  let r = reports[index];
+  day.value = r.d;
+  itemSelect.innerHTML = `<option>${r.n}</option>`; // giữ lại mặt hàng để sửa
+  itemSelect.value = r.n;
+  qty.value = r.q;
+  reports.splice(index,1); // xoá bản ghi cũ
+  save();renderReport();
 }
 
 function exportTxt(){
-let txt="";
-[...new Set(reports.map(r=>r.d))].forEach(d=>{
-txt+=d+"\n";
-reports.filter(r=>r.d===d).forEach(r=>{
-txt+=`${r.q} ${r.n} : ${r.t}\n`;
-});
-txt+="\n";
-});
-txt+=`Tổng tiền: ${weekTotal.innerText} đ`;
-let blob=new Blob([txt],{type:"text/plain"});
-let a=document.createElement("a");
-a.href=URL.createObjectURL(blob);
-a.download="bao_cao.txt";
-a.click();
+  let txt="";
+  // độ rộng cột để căn lề
+  const colQty = 5;   // số lượng
+  const colName = 15; // tên mặt hàng
+  const colPrice = 8; // thành tiền
+
+  [...new Set(reports.map(r=>r.d))].forEach(d=>{
+    txt+=d+"\n";
+    reports.filter(r=>r.d===d).forEach(r=>{
+      let line = 
+        String(r.q).padEnd(colQty) + 
+        r.n.padEnd(colName) + 
+        ": " + 
+        String(r.t).padStart(colPrice);
+      txt+=line+"\n";
+    });
+    txt+="\n";
+  });
+  txt+=`Tổng tiền  : ${weekTotal.innerText} đ`;
+  
+  let blob=new Blob([txt],{type:"text/plain"});
+  let a=document.createElement("a");
+  a.href=URL.createObjectURL(blob);
+  a.download="bao_cao.txt";
+  a.click();
+}
+
+function exportExcel(){
+  let rows = [["Ngày","Số lượng","Mặt hàng","Thành tiền"]];
+  reports.forEach(r=>{
+    rows.push([r.d,r.q,r.n,r.t]);
+  });
+  rows.push(["","Tổng tuần","",""+weekTotal.innerText]);
+
+  let csv = rows.map(e=>e.join(",")).join("\n");
+  let blob = new Blob([csv],{type:"text/csv"});
+  let a=document.createElement("a");
+  a.href=URL.createObjectURL(blob);
+  a.download="bao_cao.csv";
+  a.click();
 }
 
 renderItems();renderSelect();renderReport();
