@@ -164,7 +164,7 @@ function editReport(index){
 function exportTxt(){
   let txt="";
   const maxQty = Math.max(...reports.map(r=>String(r.q).length),3);
-  const maxName = Math.max(...reports.map(r=>r.n.length),5);
+  const maxName = Math.max(...reports.map(r=>r.n.length),20);
   const maxPrice = Math.max(...reports.map(r=>String(r.t).length),5);
 
   [...new Set(reports.map(r=>r.d))].forEach(d=>{
