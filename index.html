@@ -157,44 +157,48 @@ function editReport(index){
 
 function exportTxt(){
   let txt="";
-  // độ rộng cột để căn lề
-  const colQty = 5;   // số lượng
-  const colName = 15; // tên mặt hàng
-  const colPrice = 8; // thành tiền
+  // Tìm độ rộng tối đa cho các cột
+  const maxQty = Math.max(...reports.map(r=>String(r.q).length),3);
+  const maxName = Math.max(...reports.map(r=>r.n.length),5);
+  const maxPrice = Math.max(...reports.map(r=>String(r.t).length),5);
 
   [...new Set(reports.map(r=>r.d))].forEach(d=>{
     txt+=d+"\n";
     reports.filter(r=>r.d===d).forEach(r=>{
       let line = 
-        String(r.q).padEnd(colQty) + 
-        r.n.padEnd(colName) + 
+        String(r.q).padEnd(maxQty+2) + 
+        r.n.padEnd(maxName+4) + 
         ": " + 
-        String(r.t).padStart(colPrice);
+        String(r.t).padStart(maxPrice);
       txt+=line+"\n";
     });
     txt+="\n";
   });
-  txt+=`Tổng tiền  : ${weekTotal.innerText} đ`;
-  
+  txt+=`Tổng tiền  : ${weekTotal.innerText};
+
   let blob=new Blob([txt],{type:"text/plain"});
   let a=document.createElement("a");
   a.href=URL.createObjectURL(blob);
-  a.download="bao_cao.txt";
+  a.download="GiayTinhTien.txt";
   a.click();
 }
 
 function exportExcel(){
-  let rows = [["Ngày","Số lượng","Mặt hàng","Thành tiền"]];
-  reports.forEach(r=>{
-    rows.push([r.d,r.q,r.n,r.t]);
+  let rows = [];
+  [...new Set(reports.map(r=>r.d))].forEach(d=>{
+    // đánh dấu ngày bằng *** để dễ nhận biết
+    rows.push([`*** ${d} ***`,"","",""]);
+    reports.filter(r=>r.d===d).forEach(r=>{
+      rows.push(["",r.q,r.n,r.t]);
+    });
   });
-  rows.push(["","Tổng tuần","",""+weekTotal.innerText]);
+  rows.push(["","Tổng tiền","",""+weekTotal.innerText]);
 
   let csv = rows.map(e=>e.join(",")).join("\n");
   let blob = new Blob([csv],{type:"text/csv"});
   let a=document.createElement("a");
   a.href=URL.createObjectURL(blob);
-  a.download="bao_cao.csv";
+  a.download="GiayTinhTen.csv";
   a.click();
 }
 
