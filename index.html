@@ -6,222 +6,226 @@
 <title>Sổ bán bánh</title>
 
 <style>
-body{font-family:Arial;background:#f2f2f2;padding:10px}
-h2{margin-top:20px}
-input,select,button{width:100%;padding:12px;margin:6px 0;font-size:16px}
-.section{background:#fff;padding:12px;border-radius:6px;margin-bottom:15px}
-button{border:none;color:#fff;border-radius:4px}
-.btn-add{background:#4CAF50}
-.btn-clear{background:#e74c3c}
-.row{
-  display:grid;
-  grid-template-columns: 40px 120px 10px 80px;
-  align-items:center;
-  gap: 6px;
-  padding:6px 0;
-  border-bottom:1px solid #ddd;
+body { font-family: Arial, sans-serif; padding: 10px; background: #f5f5f5; }
+h2,h3 { margin: 15px 0 10px; }
+.section { background: #fff; padding: 10px; border-radius: 8px; margin-bottom: 12px; }
+
+input, select {
+  width: 100%; padding: 8px; margin: 5px 0;
 }
 
-.row .sl{ text-align:left; }
-.row .item{ text-align:left; }
-.row .sep{ text-align:center; }
-.row .money{ text-align:right; }
-.total{font-weight:bold;font-size:18px;margin-top:10px}
-.report{background:#fff;padding:12px;border-radius:6px;margin-top:10px}
-
-.btn-report{
-  background:#ffffff;
-  color:#007bff;      /* xanh blue */
-  border:1px solid #007bff;
-  font-weight:bold;
+button {
+  width: 100%; padding: 10px; margin-top: 6px;
+  border: none; border-radius: 6px; font-size: 16px;
 }
 
+.btn-add { background: #4CAF50; color: #fff; }
+.btn-del { background: #e74c3c; color: #fff; }
+.btn-line { background: #ccc; width: auto; padding: 4px 8px; }
+
+.item-row, .report-row {
+  display: flex; align-items: center; gap: 6px;
+  padding: 4px 0; border-bottom: 1px solid #ddd;
+}
+
+.item-row span { flex: 1; }
+.report-row span { flex: 1; }
+.report-row input { width: 60px; }
+
+.total { font-weight: bold; margin-top: 10px; }
+.link { color: blue; cursor: pointer; }
 </style>
 </head>
 
 <body>
 
-<h2>🍔 Quản lý mặt hàng</h2>
+<h2>🍔 Sổ bán bánh</h2>
+
+<!-- QUẢN LÝ MẶT HÀNG -->
 <div class="section">
+<h3>📦 Quản lý mặt hàng</h3>
 <input id="itemName" placeholder="Tên mặt hàng">
 <input id="itemPrice" type="number" placeholder="Giá tiền">
 <button class="btn-add" onclick="addItem()">➕ Thêm mặt hàng</button>
-<button class="btn-clear" onclick="clearItems()">🗑 Xóa toàn bộ mặt hàng</button>
+<button class="btn-del" onclick="clearAllItems()">🗑 Xóa tất cả mặt hàng</button>
+<div id="itemList"></div>
 </div>
 
-<h2>🧾 Bán hàng</h2>
+<!-- BÁN HÀNG -->
 <div class="section">
-<select id="thu" onchange="renderItems()">
+<h3>🧾 Bán hàng</h3>
+
+<select id="thu">
 <option>Thứ 2</option><option>Thứ 3</option><option>Thứ 4</option>
 <option>Thứ 5</option><option>Thứ 6</option><option>Thứ 7</option><option>Chủ nhật</option>
 </select>
 
-<select id="itemSelect" onchange="calcTien()"></select>
-
-<input id="sl" type="number" placeholder="Số lượng" oninput="calcTien()">
-<input id="tien" type="number" placeholder="Số tiền dòng này" readonly>
+<select id="itemSelect"></select>
+<input id="qty" type="number" placeholder="Số lượng">
+<input id="lineTotal" type="number" placeholder="Thành tiền" readonly>
 
 <button class="btn-add" onclick="addSale()">➕ Thêm</button>
-<button class="btn-clear" onclick="clearSales()">🗑 Clear dữ liệu tuần</button>
+<button class="btn-del" onclick="clearSales()">🗑 Clear dữ liệu tuần</button>
 </div>
 
-<div class="total">Tổng tuần: <span id="tong">0</span> đ</div>
-
-<button class="btn-report" onclick="showReport()">📄 Xem báo cáo</button>
+<!-- BÁO CÁO -->
+<div class="section">
+<h3 class="link" onclick="renderReport()">📊 Xem báo cáo</h3>
+<button class="btn-add" onclick="copyReport()">📋 Copy báo cáo</button>
 <div id="report"></div>
+</div>
 
 <script>
 let items = JSON.parse(localStorage.getItem("items")||"[]");
 let sales = JSON.parse(localStorage.getItem("sales")||"[]");
 
-function save(){
-  localStorage.setItem("items",JSON.stringify(items));
-  localStorage.setItem("sales",JSON.stringify(sales));
+function save() {
+  localStorage.setItem("items", JSON.stringify(items));
+  localStorage.setItem("sales", JSON.stringify(sales));
+  renderItems(); renderDropdown(); renderReport();
 }
 
-function addItem(){
-  let n=itemName.value.trim();
-  let p=Number(itemPrice.value);
-  if(!n||p<=0) return alert("Nhập đủ tên và giá");
-  items.push({name:n,price:p});
+/* ===== MẶT HÀNG ===== */
+function addItem() {
+  let name = itemName.value.trim();
+  let price = Number(itemPrice.value);
+  if (!name || price<=0) return alert("Nhập đủ tên và giá");
+  if (items.some(i=>i.name===name)) return alert("Đã tồn tại");
+  items.push({name,price});
+  itemName.value=""; itemPrice.value="";
   save();
-  renderItems();
-  itemName.value=itemPrice.value="";
 }
 
-function clearItems(){
-  if(confirm("Xóa toàn bộ mặt hàng và dữ liệu bán?")){
-    items=[]; sales=[];
-    localStorage.clear();
-    renderItems(); renderTotal(); report.innerHTML="";
-  }
+function deleteItem(name) {
+  if (sales.some(s=>s.item===name)) return alert("Mặt hàng đã bán, không xóa được");
+  items = items.filter(i=>i.name!==name);
+  save();
 }
 
-function renderItems(){
-  itemSelect.innerHTML="";
-  items.forEach((i,idx)=>{
-    let o=document.createElement("option");
-    o.value=idx;
-    o.text=i.name;
-    itemSelect.appendChild(o);
+function clearAllItems() {
+  if (!confirm("Xóa toàn bộ mặt hàng?")) return;
+  items=[]; save();
+}
+
+function renderItems() {
+  itemList.innerHTML="";
+  items.forEach(i=>{
+    itemList.innerHTML+=`
+      <div class="item-row">
+        <span>${i.name} - ${i.price}</span>
+        <button class="btn-line" onclick="deleteItem('${i.name}')">X</button>
+      </div>`;
   });
 }
 
-function calcTien(){
-  let sl=Number(document.getElementById("sl").value);
-  let i=items[itemSelect.value];
-  if(sl>0 && i){
-    tien.value = sl * i.price;
-  }
+function renderDropdown() {
+  itemSelect.innerHTML="";
+  items.forEach(i=>{
+    itemSelect.innerHTML+=`<option value="${i.name}">${i.name}</option>`;
+  });
 }
 
-function addSale(){
-  let i=items[itemSelect.value];
-  let slVal=Number(sl.value);
-  let tienVal=Number(tien.value);
-  if(!i||slVal<=0) return alert("Thiếu dữ liệu");
-  let thuVal = document.getElementById("thu").value;
+/* ===== BÁN HÀNG ===== */
+itemSelect.onchange = calcLine;
+qty.oninput = calcLine;
+
+function calcLine() {
+  let item = items.find(i=>i.name===itemSelect.value);
+  lineTotal.value = item ? (qty.value*item.price||0) : 0;
+}
+
+function addSale() {
+  if (!itemSelect.value || qty.value<=0) return alert("Thiếu dữ liệu");
+  let thuVal = thu.value;
+  if (sales.some(s=>s.thu===thuVal && s.item===itemSelect.value))
+    return alert("Đã nhập mặt hàng này trong ngày");
 
   sales.push({
-	thu: thuVal,
-	item: i.name,
-	price: i.price,
-	sl: slVal
-});
+    id: Date.now(),
+    thu: thuVal,
+    item: itemSelect.value,
+    qty: Number(qty.value),
+    price: items.find(i=>i.name===itemSelect.value).price
+  });
+  qty.value=""; lineTotal.value="";
   save();
-  sl.value=tien.value="";
-  renderTotal();
-  renderItems();
 }
 
-function clearSales(){
-  if(confirm("Clear toàn bộ dữ liệu tuần?")){
-    sales=[];
-    save();
-    renderTotal();
-    report.innerHTML="";
-  }
+function clearSales() {
+  if (!confirm("Clear toàn bộ dữ liệu tuần?")) return;
+  sales=[]; save();
 }
 
-function renderTotal(){
-  let t=0;
-  sales.forEach(s=>t+=s.sl*s.price);
-  tong.innerText=t.toLocaleString();
+/* ===== BÁO CÁO ===== */
+function updateRow(id, field, val) {
+  let r = sales.find(s=>s.id===id);
+  r[field]=Number(val);
+  save();
 }
 
-function renderItems(){
-  let thuVal = document.getElementById("thu").value;
-
-  // Lấy danh sách mặt hàng đã bán trong Thứ đang chọn
-  let daBan = sales
-    .filter(s => s.thu === thuVal)
-    .map(s => s.item);
-
-  itemSelect.innerHTML = "";
-
-  items.forEach((i, idx) => {
-    if (daBan.includes(i.name)) return; // đã bán → không hiện
-
-    let o = document.createElement("option");
-    o.value = idx;
-    o.text = i.name;
-    itemSelect.appendChild(o);
-  });
+function deleteRow(id) {
+  sales = sales.filter(s=>s.id!==id);
+  save();
 }
 
+function renderReport() {
+  report.innerHTML="";
+  let total=0;
+  let byThu = {};
 
-function showReport(){
-  let byDay = {};
-  let grandTotal = 0;
-
-  // Gom dữ liệu theo Thứ -> Mặt hàng
   sales.forEach(s=>{
-    let day = s.thu || "Khác";
-    if(!byDay[day]) byDay[day] = {};
-
-    let key = s.item + "|" + s.price;
-    if(!byDay[day][key]){
-      byDay[day][key] = { item:s.item, price:s.price, sl:0 };
-    }
-    byDay[day][key].sl += s.sl;
+    byThu[s.thu]=byThu[s.thu]||[];
+    byThu[s.thu].push(s);
   });
 
-  let html = '<div class="report">';
+  Object.keys(byThu).forEach(t=>{
+    report.innerHTML+=`<b>${t}</b>`;
+    byThu[t].forEach(s=>{
+      let sum=s.qty*s.price; total+=sum;
+      report.innerHTML+=`
+      <div class="report-row">
+        <input type="number" value="${s.qty}" onchange="updateRow(${s.id},'qty',this.value)">
+        <span>${s.item}</span>
+        <input type="number" value="${s.price}" onchange="updateRow(${s.id},'price',this.value)">
+        <b>: ${sum}</b>
+        <button class="btn-line" onclick="deleteRow(${s.id})">X</button>
+      </div>`;
+    });
+    report.innerHTML+=`<hr>`;
+  });
 
-  for(let day in byDay){
-    html += `<div style="font-weight:bold;margin-top:10px">${day}</div>`;
-
-    let dayTotal = 0;
-
-    for(let k in byDay[day]){
-      let r = byDay[day][k];
-      let thanhTien = r.sl * r.price;
-      dayTotal += thanhTien;
-      grandTotal += thanhTien;
-
-      html += `
-        <div class="row">
-          <div class="sl">${r.sl}</div>
-          <div class="item">${r.item}</div>
-          <div class="sep">:</div>
-          <div class="money">${thanhTien.toLocaleString()}</div>
-        </div>
-      `;
-    }
-
-    html += `<div style="border-bottom:1px dashed #999;margin:6px 0"></div>`;
-  }
-
-  html += `<div class="total">Tổng tiền: ${grandTotal.toLocaleString()} đ</div>`;
-  html += `<div style="border-bottom:2px solid #000;margin-top:6px"></div>`;
-  html += '</div>';
-
-  document.getElementById("report").innerHTML = html;
+  report.innerHTML+=`<div class="total">Tổng tiền: ${total} đ</div>`;
 }
 
+/* ===== COPY BÁO CÁO TEXT ===== */
+function copyReport() {
+  if (sales.length===0) return alert("Chưa có dữ liệu");
 
-renderItems();
-renderTotal();
+  let text="", total=0, byThu={};
+
+  sales.forEach(s=>{
+    byThu[s.thu]=byThu[s.thu]||[];
+    byThu[s.thu].push(s);
+  });
+
+  Object.keys(byThu).forEach(thu=>{
+    text+=thu+"\n";
+    byThu[thu].forEach(s=>{
+      let sum=s.qty*s.price;
+      total+=sum;
+      text+=`${s.qty}  ${s.item} : ${sum}\n`;
+    });
+    text+="----------------\n\n";
+  });
+
+  text+=`Tổng tiền: ${total} đ`;
+
+  navigator.clipboard.writeText(text).then(()=>{
+    alert("✅ Đã copy báo cáo – dán vào Zalo / Ghi chú nhé");
+  });
+}
+
+save();
 </script>
 
 </body>
