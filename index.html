@@ -58,7 +58,7 @@ hr{border-top:1px dashed #aaa}
 </div>
 
 <div class="box">
-<div class="total">Tổng tuần: <span id="weekTotal">0</span> đ</div>
+<div class="total">Tổng tuần: <span id="weekTotal">0</span></div>
 <button class="btn-blue" onclick="exportTxt()">📄 Xuất báo cáo TXT</button>
 <button class="btn-blue" onclick="exportExcel()">📊 Xuất Excel (CSV)</button>
 <button class="btn-add" onclick="reloadPage()">🔄 Load lại trang</button>
@@ -141,23 +141,22 @@ function renderReport(){
     html+="<hr></div>";
   });
   weekTotal.innerText=total;
-  html+=`<div class="total">Tổng tiền: ${total} đ</div>`;
+  html+=`<div class="total">Tổng tiền: ${total}</div>`;
   reportView.innerHTML=html;
 }
 
 function editReport(index){
   let r = reports[index];
   day.value = r.d;
-  itemSelect.innerHTML = `<option>${r.n}</option>`; // giữ lại mặt hàng để sửa
+  itemSelect.innerHTML = `<option>${r.n}</option>`; 
   itemSelect.value = r.n;
   qty.value = r.q;
-  reports.splice(index,1); // xoá bản ghi cũ
+  reports.splice(index,1); 
   save();renderReport();
 }
 
 function exportTxt(){
   let txt="";
-  // Tìm độ rộng tối đa cho các cột
   const maxQty = Math.max(...reports.map(r=>String(r.q).length),3);
   const maxName = Math.max(...reports.map(r=>r.n.length),5);
   const maxPrice = Math.max(...reports.map(r=>String(r.t).length),5);
@@ -174,7 +173,14 @@ function exportTxt(){
     });
     txt+="\n";
   });
-  txt+=`Tổng tiền  : ${weekTotal.innerText};
+
+  // căn lề dòng tổng tiền
+  let totalLine = 
+    "".padEnd(maxQty+2) + 
+    "Tổng tiền".padEnd(maxName+4) + 
+    ": " + 
+    String(weekTotal.innerText).padStart(maxPrice);
+  txt+=totalLine;
 
   let blob=new Blob([txt],{type:"text/plain"});
   let a=document.createElement("a");
@@ -186,11 +192,11 @@ function exportTxt(){
 function exportExcel(){
   let rows = [];
   [...new Set(reports.map(r=>r.d))].forEach(d=>{
-    // đánh dấu ngày bằng *** để dễ nhận biết
     rows.push([`*** ${d} ***`,"","",""]);
     reports.filter(r=>r.d===d).forEach(r=>{
       rows.push(["",r.q,r.n,r.t]);
     });
+    rows.push(["","","",""]);
   });
   rows.push(["","Tổng tiền","",""+weekTotal.innerText]);
 
@@ -198,7 +204,7 @@ function exportExcel(){
   let blob = new Blob([csv],{type:"text/csv"});
   let a=document.createElement("a");
   a.href=URL.createObjectURL(blob);
-  a.download="GiayTinhTen.csv";
+  a.download="GiayTinhTien.csv";
   a.click();
 }
 
