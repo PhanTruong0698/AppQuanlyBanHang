@@ -164,29 +164,18 @@ function editReport(index){
 function exportTxt(){
   let txt = "";
 
+  // duyệt theo từng ngày
   [...new Set(reports.map(r => r.d))].forEach(d => {
     txt += d + "\n";
     reports.filter(r => r.d === d).forEach(r => {
-      // số lượng luôn 3 ký tự
-      let qty = String(r.q).padEnd(3);
-
-      // ghép số lượng + tên
-      let leftPart = qty + " " + r.n;
-
-      // tạo khoảng trắng cố định để thành tiền luôn ở cột 50
-      let spaces = " ".repeat(50 - leftPart.length);
-
-      // ghép thành tiền
-      let line = leftPart + spaces + ": " + r.t;
+      let line = `${r.q} ${r.n}: ${r.t}`;
       txt += line + "\n";
     });
     txt += "\n";
   });
 
   // dòng tổng tiền
-  let totalLeft = "Tổng tiền";
-  let spaces = " ".repeat(50 - totalLeft.length);
-  txt += totalLeft + spaces + ": " + weekTotal.innerText;
+  txt += `Tổng tiền: ${weekTotal.innerText}`;
 
   // tạo file TXT
   let blob = new Blob([txt], { type: "text/plain" });
