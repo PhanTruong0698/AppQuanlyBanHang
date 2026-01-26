@@ -168,16 +168,16 @@ function exportTxt(){
   [...new Set(reports.map(r => r.d))].forEach(d => {
     txt += d + "\n";
     reports.filter(r => r.d === d).forEach(r => {
-      // số lượng luôn length = 3
+      // số lượng mặc định length = 3
       let qty = String(r.q).padEnd(3);
 
-      // ghép số lượng + tên mặt hàng
-      let leftPart = (qty + " " + r.n);
+      // ghép số lượng + tên
+      let leftPart = qty + " " + r.n;
 
       // căn cho đủ 50 ký tự
       leftPart = leftPart.padEnd(50);
 
-      // thành tiền
+      // thành tiền luôn bắt đầu từ cột 50
       let line = leftPart + ": " + r.t;
       txt += line + "\n";
     });
