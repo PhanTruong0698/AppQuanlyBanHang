@@ -37,6 +37,7 @@ const dom = {
   currentWeek: document.querySelector("#currentWeek"),
   tabButtons: document.querySelectorAll(".tab-btn"),
   tabPanels: document.querySelectorAll(".tab-panel"),
+  reportOnlySections: document.querySelectorAll(".report-only"),
   itemForm: document.querySelector("#itemForm"),
   itemName: document.querySelector("#itemName"),
   itemPrice: document.querySelector("#itemPrice"),
@@ -779,6 +780,8 @@ function bindEvents() {
 }
 
 function switchTab(targetId) {
+  const showReportSections = targetId === "reportPanel";
+
   dom.tabButtons.forEach((button) => {
     const active = button.dataset.tabTarget === targetId;
     button.classList.toggle("active", active);
@@ -789,6 +792,10 @@ function switchTab(targetId) {
     const active = panel.id === targetId;
     panel.classList.toggle("active", active);
     panel.hidden = !active;
+  });
+
+  dom.reportOnlySections.forEach((section) => {
+    section.hidden = !showReportSections;
   });
 }
 

@@ -8,8 +8,8 @@
   <link rel="manifest" href="manifest.webmanifest">
   <link rel="icon" href="assets/app-icon.svg" type="image/svg+xml">
   <link rel="apple-touch-icon" href="assets/app-icon.svg">
-  <link rel="stylesheet" href="style.css">
-  <script src="app.js" defer></script>
+  <link rel="stylesheet" href="style.css?v=3">
+  <script src="app.js?v=3" defer></script>
 </head>
 <body>
   <svg class="svg-sprite" aria-hidden="true">
@@ -140,7 +140,7 @@
       <div id="itemList" class="list" aria-live="polite"></div>
     </section>
 
-    <section class="panel summary" aria-labelledby="summaryTitle">
+    <section class="panel summary report-only" aria-labelledby="summaryTitle">
       <div class="summary-total">
         <span class="section-label"><svg class="icon"><use href="#icon-table"></use></svg>Tổng kết</span>
         <h2 id="summaryTitle">Doanh thu tuần</h2>
@@ -173,7 +173,7 @@
       </div>
     </section>
 
-    <section class="panel" aria-labelledby="reportViewTitle">
+    <section class="panel report-only" aria-labelledby="reportViewTitle">
       <div class="panel-heading">
         <div>
           <span class="section-label"><svg class="icon"><use href="#icon-table"></use></svg>Chi tiết</span>
