@@ -597,88 +597,37 @@ button:focus-visible {
     grid-template-columns: 1fr;
   }
 
-  .table,
-  .table tbody,
-  .table tr,
-  .table td {
-    display: block;
-    width: 100%;
-  }
-
-  .table thead {
-    display: none;
+  .list,
+  .report-view {
+    overflow-x: auto;
+    padding-bottom: 4px;
   }
 
   .table {
-    border: 0;
-    background: transparent;
+    min-width: 620px;
+    border-collapse: separate;
+    border-spacing: 0;
   }
 
-  .table tr {
-    margin-bottom: 10px;
-    padding: 12px;
-    border: 1px solid var(--line);
-    border-radius: 8px;
-    background: #fff;
-  }
-
-  .table tr:last-child {
-    margin-bottom: 0;
-  }
-
+  .table th,
   .table td {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    gap: 12px;
-    border-bottom: 0;
-    padding: 5px 0;
-    color: var(--text);
-    font-size: 15px;
-  }
-
-  .table td::before {
-    content: attr(data-label);
-    flex: 0 0 auto;
-    color: var(--muted);
+    padding: 9px 8px;
     font-size: 13px;
-    font-weight: 800;
-    text-align: left;
+    white-space: nowrap;
   }
 
-  .table td[data-label="Mặt hàng"],
-  .table td[data-label="Tên mặt hàng"] {
-    padding-bottom: 8px;
-    font-size: 18px;
-    font-weight: 800;
-  }
-
-  .table td[data-label="Mặt hàng"]::before,
-  .table td[data-label="Tên mặt hàng"]::before {
+  .table th {
     font-size: 12px;
   }
 
-  .table td[data-label="Thành tiền"] {
-    color: var(--primary-dark);
-    font-size: 18px;
-    font-weight: 800;
-  }
-
-  .table td:last-child {
-    display: block;
-    padding-top: 10px;
-  }
-
-  .table td:last-child::before {
-    display: none;
-  }
-
   .row-actions {
-    justify-content: stretch;
+    gap: 6px;
   }
 
   .small-btn {
-    flex: 1;
+    min-height: 32px;
+    padding: 6px 9px;
+    font-size: 13px;
   }
 
   .stat-grid {

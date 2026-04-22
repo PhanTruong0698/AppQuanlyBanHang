@@ -1,4 +1,4 @@
-const CACHE_NAME = "quan-ly-ban-hang-v1";
+const CACHE_NAME = "quan-ly-ban-hang-v2";
 const ASSETS = [
   "./",
   "./index.html",
