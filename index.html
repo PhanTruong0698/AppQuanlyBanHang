@@ -4,23 +4,60 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Phần mềm quản lý bán hàng</title>
+  <link rel="icon" href="assets/app-icon.svg" type="image/svg+xml">
   <link rel="stylesheet" href="style.css">
   <script src="app.js" defer></script>
 </head>
 <body>
+  <svg class="svg-sprite" aria-hidden="true">
+    <symbol id="icon-store" viewBox="0 0 24 24">
+      <path d="M3 9l1.2-5h15.6L21 9"></path><path d="M5 9v10h14V9"></path><path d="M9 19v-6h6v6"></path><path d="M3 9h18"></path>
+    </symbol>
+    <symbol id="icon-box" viewBox="0 0 24 24">
+      <path d="M21 8l-9-5-9 5 9 5 9-5z"></path><path d="M3 8v8l9 5 9-5V8"></path><path d="M12 13v8"></path>
+    </symbol>
+    <symbol id="icon-clipboard" viewBox="0 0 24 24">
+      <path d="M9 5h6"></path><path d="M9 3h6v4H9z"></path><path d="M5 5h3v2h8V5h3v16H5z"></path><path d="M8 12h8"></path><path d="M8 16h6"></path>
+    </symbol>
+    <symbol id="icon-plus" viewBox="0 0 24 24">
+      <path d="M12 5v14"></path><path d="M5 12h14"></path>
+    </symbol>
+    <symbol id="icon-x" viewBox="0 0 24 24">
+      <path d="M18 6L6 18"></path><path d="M6 6l12 12"></path>
+    </symbol>
+    <symbol id="icon-file" viewBox="0 0 24 24">
+      <path d="M14 3H6v18h12V7z"></path><path d="M14 3v4h4"></path><path d="M8 13h8"></path><path d="M8 17h6"></path>
+    </symbol>
+    <symbol id="icon-table" viewBox="0 0 24 24">
+      <path d="M4 5h16v14H4z"></path><path d="M4 10h16"></path><path d="M9 5v14"></path><path d="M15 5v14"></path>
+    </symbol>
+    <symbol id="icon-download" viewBox="0 0 24 24">
+      <path d="M12 3v12"></path><path d="M7 10l5 5 5-5"></path><path d="M5 21h14"></path>
+    </symbol>
+    <symbol id="icon-upload" viewBox="0 0 24 24">
+      <path d="M12 15V3"></path><path d="M7 8l5-5 5 5"></path><path d="M5 21h14"></path>
+    </symbol>
+    <symbol id="icon-trash" viewBox="0 0 24 24">
+      <path d="M4 7h16"></path><path d="M10 11v6"></path><path d="M14 11v6"></path><path d="M6 7l1 14h10l1-14"></path><path d="M9 7V4h6v3"></path>
+    </symbol>
+  </svg>
+
   <main class="app">
-    <header class="app-header">
-      <div>
-        <span class="eyebrow">Sổ bán hàng</span>
+    <header class="app-header hero">
+      <div class="hero-copy">
+        <span class="eyebrow"><svg class="icon"><use href="#icon-store"></use></svg>Sổ bán hàng</span>
         <h1>Quản lý bán hàng</h1>
         <p>Theo dõi mặt hàng, số lượng bán theo ngày và tổng tiền trong tuần.</p>
       </div>
+      <div class="hero-art" aria-hidden="true">
+        <img src="assets/sales-hero.png" alt="">
+      </div>
     </header>
 
-    <section class="panel" aria-labelledby="itemsTitle">
+    <section class="panel input-panel" aria-labelledby="itemsTitle">
       <div class="panel-heading">
         <div>
-          <span class="section-label">Danh mục</span>
+          <span class="section-label"><svg class="icon"><use href="#icon-box"></use></svg>Danh mục</span>
           <h2 id="itemsTitle">Quản lý mặt hàng</h2>
         </div>
       </div>
@@ -31,19 +68,19 @@
         </label>
         <label class="field">
           <span>Đơn giá</span>
-          <input id="itemPrice" name="itemPrice" type="number" min="1" step="1" placeholder="Ví dụ: 15000" required>
+          <input id="itemPrice" name="itemPrice" type="number" min="0.01" step="any" placeholder="Ví dụ: 3.5" required>
         </label>
-        <button class="btn btn-primary" type="submit">Thêm / Cập nhật</button>
-        <button class="btn btn-muted" id="cancelItemEdit" type="button" hidden>Hủy sửa</button>
+        <button class="btn btn-primary" type="submit"><svg class="icon"><use href="#icon-plus"></use></svg>Thêm / Cập nhật</button>
+        <button class="btn btn-muted" id="cancelItemEdit" type="button" hidden><svg class="icon"><use href="#icon-x"></use></svg>Hủy sửa</button>
       </form>
       <p id="itemMessage" class="message" role="status" aria-live="polite"></p>
       <div id="itemList" class="list" aria-live="polite"></div>
     </section>
 
-    <section class="panel" aria-labelledby="reportTitle">
+    <section class="panel input-panel" aria-labelledby="reportTitle">
       <div class="panel-heading">
         <div>
-          <span class="section-label">Bán trong tuần</span>
+          <span class="section-label"><svg class="icon"><use href="#icon-clipboard"></use></svg>Bán trong tuần</span>
           <h2 id="reportTitle">Nhập báo cáo</h2>
         </div>
       </div>
@@ -60,35 +97,35 @@
           <span>Số lượng</span>
           <input id="qty" name="qty" type="number" min="0.01" step="any" placeholder="Ví dụ: 1.5" required>
         </label>
-        <button class="btn btn-primary" type="submit">Thêm vào báo cáo</button>
-        <button class="btn btn-muted" id="cancelReportEdit" type="button" hidden>Hủy sửa</button>
+        <button class="btn btn-primary" type="submit"><svg class="icon"><use href="#icon-plus"></use></svg>Thêm vào báo cáo</button>
+        <button class="btn btn-muted" id="cancelReportEdit" type="button" hidden><svg class="icon"><use href="#icon-x"></use></svg>Hủy sửa</button>
       </form>
       <p id="reportMessage" class="message" role="status" aria-live="polite"></p>
     </section>
 
     <section class="panel summary" aria-labelledby="summaryTitle">
       <div class="summary-total">
-        <span class="section-label">Tổng kết</span>
+        <span class="section-label"><svg class="icon"><use href="#icon-table"></use></svg>Tổng kết</span>
         <h2 id="summaryTitle">Doanh thu tuần</h2>
         <p class="total"><strong id="weekTotal">0</strong></p>
       </div>
       <div class="actions">
-        <button class="btn btn-outline" id="exportTxt" type="button">Xuất TXT</button>
-        <button class="btn btn-outline" id="exportCsv" type="button">Xuất CSV</button>
-        <button class="btn btn-outline" id="backupData" type="button">Sao lưu JSON</button>
+        <button class="btn btn-outline" id="exportTxt" type="button"><svg class="icon"><use href="#icon-file"></use></svg>Xuất TXT</button>
+        <button class="btn btn-outline" id="exportCsv" type="button"><svg class="icon"><use href="#icon-table"></use></svg>Xuất CSV</button>
+        <button class="btn btn-outline" id="backupData" type="button"><svg class="icon"><use href="#icon-download"></use></svg>Sao lưu JSON</button>
         <label class="btn btn-outline file-btn">
-          Khôi phục JSON
+          <svg class="icon"><use href="#icon-upload"></use></svg>Khôi phục JSON
           <input id="restoreData" type="file" accept="application/json,.json">
         </label>
-        <button class="btn btn-danger" id="clearReports" type="button">Xóa báo cáo tuần</button>
-        <button class="btn btn-danger" id="clearAll" type="button">Xóa toàn bộ dữ liệu</button>
+        <button class="btn btn-danger" id="clearReports" type="button"><svg class="icon"><use href="#icon-trash"></use></svg>Xóa báo cáo tuần</button>
+        <button class="btn btn-danger" id="clearAll" type="button"><svg class="icon"><use href="#icon-trash"></use></svg>Xóa toàn bộ dữ liệu</button>
       </div>
     </section>
 
     <section class="panel" aria-labelledby="reportViewTitle">
       <div class="panel-heading">
         <div>
-          <span class="section-label">Chi tiết</span>
+          <span class="section-label"><svg class="icon"><use href="#icon-table"></use></svg>Chi tiết</span>
           <h2 id="reportViewTitle">Báo cáo tuần</h2>
         </div>
       </div>

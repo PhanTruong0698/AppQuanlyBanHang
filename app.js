@@ -268,7 +268,7 @@ function handleItemSubmit(event) {
   }
 
   if (!Number.isFinite(price) || price <= 0) {
-    setMessage(dom.itemMessage, "Đơn giá phải lớn hơn 0.", "error");
+    setMessage(dom.itemMessage, "Đơn giá phải là số lớn hơn 0.", "error");
     return;
   }
 

@@ -25,7 +25,7 @@ body {
   margin: 0;
   min-height: 100vh;
   background:
-    linear-gradient(180deg, #dcecf7 0, #eef3f7 260px),
+    linear-gradient(180deg, #dcecf7 0, #eef3f7 320px),
     var(--bg);
   color: var(--text);
   font-family: Arial, Helvetica, sans-serif;
@@ -39,10 +39,12 @@ body {
 }
 
 .app-header {
-  display: flex;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(280px, 420px);
+  align-items: center;
   justify-content: space-between;
   gap: 18px;
-  padding: 8px 2px 20px;
+  padding: 8px 2px 22px;
 }
 
 h1,
@@ -71,13 +73,63 @@ h2 {
 
 .eyebrow,
 .section-label {
-  display: inline-block;
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
   margin-bottom: 6px;
   color: var(--primary);
   font-size: 12px;
   font-weight: 800;
   letter-spacing: 0.08em;
   text-transform: uppercase;
+}
+
+.svg-sprite {
+  position: absolute;
+  width: 0;
+  height: 0;
+  overflow: hidden;
+}
+
+.icon {
+  width: 18px;
+  height: 18px;
+  flex: 0 0 auto;
+  stroke: currentColor;
+  stroke-width: 2;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  fill: none;
+}
+
+.hero-copy {
+  min-width: 0;
+}
+
+.hero-art {
+  position: relative;
+  min-height: 214px;
+  overflow: hidden;
+  border: 1px solid rgba(216, 224, 234, 0.95);
+  border-radius: 8px;
+  background: #fff;
+  box-shadow: var(--shadow);
+}
+
+.hero-art::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(90deg, rgba(255,255,255,0.22), rgba(255,255,255,0));
+  pointer-events: none;
+}
+
+.hero-art img {
+  width: 100%;
+  height: 100%;
+  min-height: 214px;
+  object-fit: cover;
+  display: block;
 }
 
 .panel {
@@ -87,6 +139,19 @@ h2 {
   border: 1px solid rgba(216, 224, 234, 0.95);
   border-radius: 8px;
   box-shadow: var(--shadow);
+}
+
+.input-panel {
+  position: relative;
+  overflow: hidden;
+}
+
+.input-panel::before {
+  content: "";
+  position: absolute;
+  inset: 0 auto 0 0;
+  width: 5px;
+  background: var(--primary);
 }
 
 .panel-heading {
@@ -162,6 +227,7 @@ button:focus-visible {
   display: inline-flex;
   align-items: center;
   justify-content: center;
+  gap: 8px;
   border: 1px solid transparent;
   cursor: pointer;
   font-weight: 800;
@@ -362,6 +428,18 @@ button:focus-visible {
 }
 
 @media (max-width: 900px) {
+  .app-header {
+    grid-template-columns: 1fr;
+  }
+
+  .hero-art {
+    min-height: 180px;
+  }
+
+  .hero-art img {
+    min-height: 180px;
+  }
+
   .item-grid,
   .report-grid,
   .summary,
@@ -386,6 +464,14 @@ button:focus-visible {
 
   .app-header {
     padding: 8px 0 14px;
+  }
+
+  .hero-art {
+    min-height: 150px;
+  }
+
+  .hero-art img {
+    min-height: 150px;
   }
 
   .panel {
