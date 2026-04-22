@@ -1,217 +1,99 @@
 <!DOCTYPE html>
 <html lang="vi">
 <head>
-<meta charset="UTF-8">
-<title>Phần mềm quản lý bán hàng</title>
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<style>
-body{font-family:Arial;background:#f4f6f8;margin:0;padding:10px}
-
-#reportView { font-family: Arial, sans-serif; color: #000; background: #fff; }
-
-h2{margin-top:20px}
-.box{background:#fff;padding:12px;border-radius:10px;margin-bottom:15px}
-input,select,button{width:100%;padding:10px;margin:5px 0;font-size:16px}
-button{border:none;border-radius:8px}
-.btn-add{background:#4CAF50;color:#fff}
-.btn-clear{background:#e74c3c;color:#fff}
-.btn-blue{background:#fff;border:2px solid #007bff;color:#007bff;font-weight:bold}
-.row{display:flex;gap:6px}
-.row button{flex:1}
-.report-day{margin-top:10px}
-.line{display:flex;justify-content:space-between;border-bottom:1px solid #ddd;padding:4px 0}
-.line span{width:25%;text-align:left}
-.line span:last-child{text-align:right}
-.total{font-weight:bold;font-size:18px}
-.edit{color:#007bff;font-size:14px;cursor:pointer}
-hr{border-top:1px dashed #aaa}
-
-/* Mobile-friendly */
-@media (max-width:600px){
-  body{padding:5px;font-size:14px}
-  input,select,button{font-size:14px;padding:8px}
-  h2{font-size:18px}
-  .line span{width:25%;font-size:13px}
-  .total{font-size:16px}
-  .box{padding:8px}
-}
-</style>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.25/jspdf.plugin.autotable.min.js"></script>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Phần mềm quản lý bán hàng</title>
+  <link rel="stylesheet" href="style.css">
+  <script src="app.js" defer></script>
 </head>
 <body>
+  <main class="app">
+    <header class="app-header">
+      <div>
+        <span class="eyebrow">Sổ bán hàng</span>
+        <h1>Quản lý bán hàng</h1>
+        <p>Theo dõi mặt hàng, số lượng bán theo ngày và tổng tiền trong tuần.</p>
+      </div>
+    </header>
 
-<h2>📦 Quản lý mặt hàng</h2>
-<div class="box">
-<input id="itemName" placeholder="Tên mặt hàng">
-<input id="itemPrice" type="number" placeholder="Đơn giá">
-<button class="btn-add" onclick="addItem()">➕ Thêm / Cập nhật</button>
-<button class="btn-clear" onclick="clearItems()">🗑 Xoá tất cả mặt hàng</button>
-<div id="itemList"></div>
-</div>
+    <section class="panel" aria-labelledby="itemsTitle">
+      <div class="panel-heading">
+        <div>
+          <span class="section-label">Danh mục</span>
+          <h2 id="itemsTitle">Quản lý mặt hàng</h2>
+        </div>
+      </div>
+      <form id="itemForm" class="form-grid item-grid">
+        <label class="field">
+          <span>Tên mặt hàng</span>
+          <input id="itemName" name="itemName" autocomplete="off" placeholder="Ví dụ: Cafe đen" required>
+        </label>
+        <label class="field">
+          <span>Đơn giá</span>
+          <input id="itemPrice" name="itemPrice" type="number" min="1" step="1" placeholder="Ví dụ: 15000" required>
+        </label>
+        <button class="btn btn-primary" type="submit">Thêm / Cập nhật</button>
+        <button class="btn btn-muted" id="cancelItemEdit" type="button" hidden>Hủy sửa</button>
+      </form>
+      <p id="itemMessage" class="message" role="status" aria-live="polite"></p>
+      <div id="itemList" class="list" aria-live="polite"></div>
+    </section>
 
-<h2>🧾 Nhập báo cáo</h2>
-<div class="box">
-<select id="day" onchange="renderSelect()">
-<option>Thứ 2</option><option>Thứ 3</option><option>Thứ 4</option>
-<option>Thứ 5</option><option>Thứ 6</option><option>Thứ 7</option><option>Chủ nhật</option>
-</select>
-<select id="itemSelect"></select>
-<input id="qty" type="number" placeholder="Số lượng">
-<button class="btn-add" onclick="addReport()">➕ Thêm</button>
-<button class="btn-clear" onclick="clearReports()">🗑 Clear dữ liệu tuần</button>
-</div>
+    <section class="panel" aria-labelledby="reportTitle">
+      <div class="panel-heading">
+        <div>
+          <span class="section-label">Bán trong tuần</span>
+          <h2 id="reportTitle">Nhập báo cáo</h2>
+        </div>
+      </div>
+      <form id="reportForm" class="form-grid report-grid">
+        <label class="field">
+          <span>Ngày bán</span>
+          <select id="day" name="day" required></select>
+        </label>
+        <label class="field">
+          <span>Mặt hàng</span>
+          <select id="itemSelect" name="itemSelect" required></select>
+        </label>
+        <label class="field">
+          <span>Số lượng</span>
+          <input id="qty" name="qty" type="number" min="1" step="1" placeholder="Ví dụ: 10" required>
+        </label>
+        <button class="btn btn-primary" type="submit">Thêm vào báo cáo</button>
+        <button class="btn btn-muted" id="cancelReportEdit" type="button" hidden>Hủy sửa</button>
+      </form>
+      <p id="reportMessage" class="message" role="status" aria-live="polite"></p>
+    </section>
 
-<div class="box">
-<div class="total">Tổng tiền: <span id="weekTotal">0</span></div>
-<button class="btn-blue" onclick="exportTxt()">📄 Xuất báo cáo TXT</button>
-<button class="btn-blue" onclick="exportExcel()">📊 Xuất Excel (CSV)</button>
-<button class="btn-add" onclick="reloadPage()">🔄 Load lại trang</button>
-</div>
+    <section class="panel summary" aria-labelledby="summaryTitle">
+      <div class="summary-total">
+        <span class="section-label">Tổng kết</span>
+        <h2 id="summaryTitle">Doanh thu tuần</h2>
+        <p class="total"><strong id="weekTotal">0</strong></p>
+      </div>
+      <div class="actions">
+        <button class="btn btn-outline" id="exportTxt" type="button">Xuất TXT</button>
+        <button class="btn btn-outline" id="exportCsv" type="button">Xuất CSV</button>
+        <button class="btn btn-outline" id="backupData" type="button">Sao lưu JSON</button>
+        <label class="btn btn-outline file-btn">
+          Khôi phục JSON
+          <input id="restoreData" type="file" accept="application/json,.json">
+        </label>
+        <button class="btn btn-danger" id="clearReports" type="button">Xóa báo cáo tuần</button>
+        <button class="btn btn-danger" id="clearAll" type="button">Xóa toàn bộ dữ liệu</button>
+      </div>
+    </section>
 
-<div class="box" id="reportView"></div>
-
-<script>
-let items=JSON.parse(localStorage.getItem("items")||"[]");
-let reports=JSON.parse(localStorage.getItem("reports")||"[]");
-
-function save(){
-  localStorage.setItem("items",JSON.stringify(items));
-  localStorage.setItem("reports",JSON.stringify(reports));
-}
-
-function addItem(){
-  let n=itemName.value.trim(),p=+itemPrice.value;
-  if(!n||!p)return;
-  let i=items.find(x=>x.name===n);
-  if(i)i.price=p; else items.push({name:n,price:p});
-  save();renderItems();renderSelect();
-  itemName.value=itemPrice.value="";
-}
-
-function clearItems(){
-  if(confirm("Xoá tất cả mặt hàng?")){
-    items=[];save();renderItems();renderSelect();
-  }
-}
-
-function renderItems(){
-  itemList.innerHTML=items.map(i=>`
-    <div class="line">
-      <span>${i.name}</span><span>${i.price}</span>
-      <span class="edit" onclick="editItem('${i.name}')">Sửa</span>
-    </div>`).join("");
-}
-
-function editItem(n){
-  let i=items.find(x=>x.name===n);
-  itemName.value=i.name;itemPrice.value=i.price;
-}
-
-function renderSelect(){
-  let d = day.value;
-  let used = reports.filter(r=>r.d===d).map(r=>r.n);
-  itemSelect.innerHTML = items
-    .filter(i => !used.includes(i.name))
-    .map(i => `<option>${i.name}</option>`)
-    .join("");
-}
-
-function addReport(){
-  let d=day.value,n=itemSelect.value,q=+qty.value;
-  if(!n||!q)return;
-  let price=items.find(i=>i.name===n).price;
-  reports.push({d,n,q,t:q*price});
-  save();qty.value="";renderReport();renderSelect();
-}
-
-function clearReports(){
-  if(confirm("Xoá toàn bộ báo cáo?")){
-    reports=[];save();renderReport();renderSelect();
-  }
-}
-
-function renderReport(){
-  let total=0,html="";
-  [...new Set(reports.map(r=>r.d))].forEach(d=>{
-    html+=`<div class="report-day"><b>${d}</b>`;
-    reports.filter(r=>r.d===d).forEach((r,idx)=>{
-      total+=r.t;
-      html+=`
-      <div class="line">
-        <span>${r.q}</span><span>${r.n}</span><span>${r.t}</span>
-        <span class="edit" onclick="editReport(${idx})">Sửa</span>
-      </div>`;
-    });
-    html+="<hr></div>";
-  });
-  weekTotal.innerText=total;
-  html+=`<div class="total">Tổng tiền: ${total}</div>`;
-  reportView.innerHTML=html;
-}
-
-function editReport(index){
-  let r = reports[index];
-  day.value = r.d;
-  itemSelect.innerHTML = `<option>${r.n}</option>`; 
-  itemSelect.value = r.n;
-  qty.value = r.q;
-  reports.splice(index,1); 
-  save();renderReport();
-}
-
-function exportTxt(){
-  let txt = "";
-
-  // duyệt theo từng ngày
-  [...new Set(reports.map(r => r.d))].forEach(d => {
-    txt += d + "\n";
-    reports.filter(r => r.d === d).forEach(r => {
-      let line = `${r.q} ${r.n}: ${r.t}`;
-      txt += line + "\n";
-    });
-    txt += "\n";
-  });
-
-  // dòng tổng tiền
-  txt += `Tổng tiền: ${weekTotal.innerText}`;
-
-  // tạo file TXT
-  let blob = new Blob([txt], { type: "text/plain" });
-  let a = document.createElement("a");
-  a.href = URL.createObjectURL(blob);
-  a.download = "GiayTinhTien.txt";
-  a.click();
-}
-
-function exportExcel(){
-  let rows = [];
-  [...new Set(reports.map(r=>r.d))].forEach(d=>{
-    rows.push([`*** ${d} ***`,"","",""]);
-    reports.filter(r=>r.d===d).forEach(r=>{
-      rows.push(["",r.q,r.n,r.t]);
-    });
-    rows.push(["","","",""]);
-  });
-  rows.push(["","Tổng tiền","",""+weekTotal.innerText]);
-
-  let csv = rows.map(e=>e.join(",")).join("\n");
-  let blob = new Blob([csv],{type:"text/csv"});
-  let a=document.createElement("a");
-  a.href=URL.createObjectURL(blob);
-  a.download="GiayTinhTien.csv";
-  a.click();
-}
-
-function reloadPage(){
-  if(confirm("Bạn có chắc chắn muốn load lại trang và xóa toàn bộ dữ liệu?")){
-    localStorage.clear();
-    location.reload();
-  }
-}
-
-renderItems();renderSelect();renderReport();
-</script>
+    <section class="panel" aria-labelledby="reportViewTitle">
+      <div class="panel-heading">
+        <div>
+          <span class="section-label">Chi tiết</span>
+          <h2 id="reportViewTitle">Báo cáo tuần</h2>
+        </div>
+      </div>
+      <div id="reportView" class="report-view" aria-live="polite"></div>
+    </section>
+  </main>
 </body>
 </html>
