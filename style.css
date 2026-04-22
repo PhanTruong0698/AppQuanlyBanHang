@@ -609,36 +609,95 @@ button:focus-visible {
     display: none;
   }
 
+  .table {
+    border: 0;
+    background: transparent;
+  }
+
   .table tr {
-    padding: 9px 10px;
-    border-bottom: 1px solid var(--line);
+    margin-bottom: 10px;
+    padding: 12px;
+    border: 1px solid var(--line);
+    border-radius: 8px;
+    background: #fff;
   }
 
   .table tr:last-child {
-    border-bottom: 0;
+    margin-bottom: 0;
   }
 
   .table td {
     display: flex;
     justify-content: space-between;
+    align-items: center;
     gap: 12px;
     border-bottom: 0;
-    padding: 6px 0;
+    padding: 5px 0;
+    color: var(--text);
+    font-size: 15px;
   }
 
   .table td::before {
     content: attr(data-label);
-    flex: 0 0 110px;
+    flex: 0 0 auto;
     color: var(--muted);
+    font-size: 13px;
     font-weight: 800;
     text-align: left;
   }
 
+  .table td[data-label="Mặt hàng"],
+  .table td[data-label="Tên mặt hàng"] {
+    padding-bottom: 8px;
+    font-size: 18px;
+    font-weight: 800;
+  }
+
+  .table td[data-label="Mặt hàng"]::before,
+  .table td[data-label="Tên mặt hàng"]::before {
+    font-size: 12px;
+  }
+
+  .table td[data-label="Thành tiền"] {
+    color: var(--primary-dark);
+    font-size: 18px;
+    font-weight: 800;
+  }
+
   .table td:last-child {
-    justify-content: flex-end;
+    display: block;
+    padding-top: 10px;
+  }
+
+  .table td:last-child::before {
+    display: none;
+  }
+
+  .row-actions {
+    justify-content: stretch;
+  }
+
+  .small-btn {
+    flex: 1;
   }
 
   .stat-grid {
     grid-template-columns: 1fr;
+  }
+}
+
+@media (min-width: 641px) and (max-width: 900px) {
+  .table th,
+  .table td {
+    padding: 10px 8px;
+  }
+
+  .row-actions {
+    gap: 6px;
+  }
+
+  .small-btn {
+    min-height: 34px;
+    padding: 7px 9px;
   }
 }
