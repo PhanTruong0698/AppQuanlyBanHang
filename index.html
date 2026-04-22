@@ -3,8 +3,11 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#1769aa">
   <title>Phần mềm quản lý bán hàng</title>
+  <link rel="manifest" href="manifest.webmanifest">
   <link rel="icon" href="assets/app-icon.svg" type="image/svg+xml">
+  <link rel="apple-touch-icon" href="assets/app-icon.svg">
   <link rel="stylesheet" href="style.css">
   <script src="app.js" defer></script>
 </head>
@@ -40,6 +43,9 @@
     <symbol id="icon-trash" viewBox="0 0 24 24">
       <path d="M4 7h16"></path><path d="M10 11v6"></path><path d="M14 11v6"></path><path d="M6 7l1 14h10l1-14"></path><path d="M9 7V4h6v3"></path>
     </symbol>
+    <symbol id="icon-calendar" viewBox="0 0 24 24">
+      <path d="M7 3v4"></path><path d="M17 3v4"></path><path d="M4 8h16"></path><path d="M5 5h14v16H5z"></path>
+    </symbol>
   </svg>
 
   <main class="app">
@@ -54,30 +60,27 @@
       </div>
     </header>
 
-    <section class="panel input-panel" aria-labelledby="itemsTitle">
-      <div class="panel-heading">
-        <div>
-          <span class="section-label"><svg class="icon"><use href="#icon-box"></use></svg>Danh mục</span>
-          <h2 id="itemsTitle">Quản lý mặt hàng</h2>
-        </div>
+    <section class="panel week-panel" aria-labelledby="weekTitle">
+      <div>
+        <span class="section-label"><svg class="icon"><use href="#icon-calendar"></use></svg>Tuần báo cáo</span>
+        <h2 id="weekTitle">Chọn tuần làm việc</h2>
+        <p id="weekRange" class="week-range">Đang tải tuần...</p>
       </div>
-      <form id="itemForm" class="form-grid item-grid">
+      <div class="week-controls">
         <label class="field">
-          <span>Tên mặt hàng</span>
-          <input id="itemName" name="itemName" autocomplete="off" placeholder="Ví dụ: Cafe đen" required>
+          <span>Tuần bắt đầu</span>
+          <input id="weekStart" type="date">
         </label>
-        <label class="field">
-          <span>Đơn giá</span>
-          <input id="itemPrice" name="itemPrice" type="number" min="0.01" step="any" placeholder="Ví dụ: 3.5" required>
-        </label>
-        <button class="btn btn-primary" type="submit"><svg class="icon"><use href="#icon-plus"></use></svg>Thêm / Cập nhật</button>
-        <button class="btn btn-muted" id="cancelItemEdit" type="button" hidden><svg class="icon"><use href="#icon-x"></use></svg>Hủy sửa</button>
-      </form>
-      <p id="itemMessage" class="message" role="status" aria-live="polite"></p>
-      <div id="itemList" class="list" aria-live="polite"></div>
+        <button class="btn btn-outline" id="currentWeek" type="button">Tuần hiện tại</button>
+      </div>
     </section>
 
-    <section class="panel input-panel" aria-labelledby="reportTitle">
+    <nav class="tabs" aria-label="Chọn khu vực làm việc">
+      <button class="tab-btn active" id="reportTab" type="button" data-tab-target="reportPanel">Nhập báo cáo</button>
+      <button class="tab-btn" id="itemsTab" type="button" data-tab-target="itemsPanel">Quản lý mặt hàng</button>
+    </nav>
+
+    <section class="panel input-panel primary-workflow tab-panel active" id="reportPanel" aria-labelledby="reportTitle">
       <div class="panel-heading">
         <div>
           <span class="section-label"><svg class="icon"><use href="#icon-clipboard"></use></svg>Bán trong tuần</span>
@@ -100,7 +103,41 @@
         <button class="btn btn-primary" type="submit"><svg class="icon"><use href="#icon-plus"></use></svg>Thêm vào báo cáo</button>
         <button class="btn btn-muted" id="cancelReportEdit" type="button" hidden><svg class="icon"><use href="#icon-x"></use></svg>Hủy sửa</button>
       </form>
+      <div class="copy-row" aria-label="Sao chép báo cáo giữa các ngày">
+        <label class="field">
+          <span>Sao chép từ</span>
+          <select id="copyFromDay"></select>
+        </label>
+        <label class="field">
+          <span>Sang ngày</span>
+          <select id="copyToDay"></select>
+        </label>
+        <button class="btn btn-outline" id="copyDayReports" type="button"><svg class="icon"><use href="#icon-clipboard"></use></svg>Sao chép báo cáo</button>
+      </div>
       <p id="reportMessage" class="message" role="status" aria-live="polite"></p>
+    </section>
+
+    <section class="panel input-panel tab-panel" id="itemsPanel" aria-labelledby="itemsTitle" hidden>
+      <div class="panel-heading">
+        <div>
+          <span class="section-label"><svg class="icon"><use href="#icon-box"></use></svg>Danh mục</span>
+          <h2 id="itemsTitle">Quản lý mặt hàng</h2>
+        </div>
+      </div>
+      <form id="itemForm" class="form-grid item-grid">
+        <label class="field">
+          <span>Tên mặt hàng</span>
+          <input id="itemName" name="itemName" autocomplete="off" placeholder="Ví dụ: Cafe đen" required>
+        </label>
+        <label class="field">
+          <span>Đơn giá</span>
+          <input id="itemPrice" name="itemPrice" type="number" min="0.01" step="any" placeholder="Ví dụ: 3.5" required>
+        </label>
+        <button class="btn btn-primary" type="submit"><svg class="icon"><use href="#icon-plus"></use></svg>Thêm / Cập nhật</button>
+        <button class="btn btn-muted" id="cancelItemEdit" type="button" hidden><svg class="icon"><use href="#icon-x"></use></svg>Hủy sửa</button>
+      </form>
+      <p id="itemMessage" class="message" role="status" aria-live="polite"></p>
+      <div id="itemList" class="list" aria-live="polite"></div>
     </section>
 
     <section class="panel summary" aria-labelledby="summaryTitle">
@@ -108,6 +145,20 @@
         <span class="section-label"><svg class="icon"><use href="#icon-table"></use></svg>Tổng kết</span>
         <h2 id="summaryTitle">Doanh thu tuần</h2>
         <p class="total"><strong id="weekTotal">0</strong></p>
+        <div class="stat-grid" aria-label="Thống kê nhanh">
+          <div class="stat-chip">
+            <span>Số dòng</span>
+            <strong id="statRows">0</strong>
+          </div>
+          <div class="stat-chip">
+            <span>Mặt hàng</span>
+            <strong id="statItems">0</strong>
+          </div>
+          <div class="stat-chip">
+            <span>Ngày cao nhất</span>
+            <strong id="statBestDay">-</strong>
+          </div>
+        </div>
       </div>
       <div class="actions">
         <button class="btn btn-outline" id="exportTxt" type="button"><svg class="icon"><use href="#icon-file"></use></svg>Xuất TXT</button>

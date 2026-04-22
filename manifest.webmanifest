@@ -1,0 +1,19 @@
+{
+  "name": "Quản lý bán hàng",
+  "short_name": "Bán hàng",
+  "description": "Theo dõi mặt hàng, số lượng bán theo ngày và doanh thu theo tuần.",
+  "start_url": "./index.html",
+  "scope": "./",
+  "display": "standalone",
+  "background_color": "#eef3f7",
+  "theme_color": "#1769aa",
+  "orientation": "portrait",
+  "icons": [
+    {
+      "src": "assets/app-icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ]
+}
