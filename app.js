@@ -292,13 +292,12 @@ function renderReport() {
     heading.textContent = day;
     block.append(heading);
 
-    const table = createTable(["Số lượng", "Mặt hàng", "Đơn giá", "Thành tiền", "Thao tác"]);
+    const table = createTable(["Số lượng", "Mặt hàng", "Thành tiền", "Thao tác"]);
     reportsByDay.forEach((report) => {
       const row = document.createElement("tr");
       row.append(
         createCell("Số lượng", String(report.quantity), "number"),
         createCell("Mặt hàng", report.itemName),
-        createCell("Đơn giá", formatMoney(report.unitPrice), "number"),
         createCell("Thành tiền", formatMoney(report.total), "number"),
         createActionCell([
           createSmallButton("Sửa", () => startEditReport(report.id)),
