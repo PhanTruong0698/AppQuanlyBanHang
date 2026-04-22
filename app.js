@@ -349,8 +349,8 @@ function handleReportSubmit(event) {
     return;
   }
 
-  if (!Number.isInteger(quantity) || quantity <= 0) {
-    setMessage(dom.reportMessage, "Số lượng phải là số nguyên lớn hơn 0.", "error");
+  if (!Number.isFinite(quantity) || quantity <= 0) {
+    setMessage(dom.reportMessage, "Số lượng phải là số lớn hơn 0.", "error");
     return;
   }
 
