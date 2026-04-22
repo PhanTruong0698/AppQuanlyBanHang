@@ -623,17 +623,17 @@ button:focus-visible {
 
   .report-view .table th:nth-child(2),
   .report-view .table td:nth-child(2) {
-    width: 34%;
+    width: 30%;
   }
 
   .report-view .table th:nth-child(3),
   .report-view .table td:nth-child(3) {
-    width: 22%;
+    width: 20%;
   }
 
   .report-view .table th:nth-child(4),
   .report-view .table td:nth-child(4) {
-    width: 26%;
+    width: 32%;
   }
 
   .row-actions {
@@ -642,8 +642,9 @@ button:focus-visible {
 
   .small-btn {
     min-height: 30px;
-    padding: 5px 7px;
-    font-size: 12px;
+    padding: 5px 6px;
+    font-size: 11px;
+    white-space: nowrap;
   }
 
   .stat-grid {
